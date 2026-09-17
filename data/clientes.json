@@ -10,5 +10,17 @@
         "nombre": "Dayra Cano",
         "email": "dc@gmail.com",
         "telefono": "+573002568123"
+    },
+    {
+        "id": 3,
+        "nombre": "gaby",
+        "email": "abcd@gmail.com",
+        "telefono": "1231122554"
+    },
+    {
+        "id": 5,
+        "nombre": "dani",
+        "email": "dani@gmail.com",
+        "telefono": "7854125478"
     }
-] 
+]
