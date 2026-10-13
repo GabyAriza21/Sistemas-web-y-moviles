@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANTYS CA BY CLAUDIA ARIZA</title>
+    <!-- CDN Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CDN Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="index.html">
+                <!-- LOGO DE LA MARCA CON RUTA LOCAL RELATIVA -->
+                <img src="asset/logo.jpeg" alt="Logo Marca" style="height: 40px; width: 40px; object-fit: cover; border-radius: 50%;" onerror="this.src='https://via.placeholder.com/40?text=Logo'">
+                <span>PANTYS CA BY CLAUDIA ARIZA</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Catálogo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="nav-link text-warning fw-bold d-flex align-items-center gap-1" 
+                           href="https://www.instagram.com/claudia_ariza07" 
+                           target="_blank" 
+                           rel="noopener noreferrer">
+                            <i class="bi bi-instagram"></i> Instagram
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container my-5">
+        <h1 class="mb-4 text-center fw-bold">Catálogo de Productos</h1>
+
+        <!-- Filtros por Categoría -->
+        <div class="row mb-4">
+            <div class="col-md-10 offset-md-1">
+                <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-outline-primary active" onclick="filtrarCategoria('todos', this)">Todos</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="filtrarCategoria('ropa-interior', this)">Ropa Interior y Bodys</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="filtrarCategoria('pijamas', this)">Pijamas</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sección de Catálogo dinámico (Los 8 productos vendrán del Backend) -->
+            <div class="col-lg-8">
+                <div class="row row-cols-1 row-cols-md-2 g-4" id="contenedor-productos">
+                    <!-- JavaScript inyectará las tarjetas aquí -->
+                </div>
+            </div>
+
+            <!-- Sección Carrito / Pedidos -->
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm sticky-top" style="top: 90px;">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Mi Carrito</h5>
+                        <span class="badge bg-light text-dark" id="conteo-carrito">0 ítems</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush mb-3" id="lista-carrito">
+                            <li class="list-group-item text-muted text-center" id="carrito-vacio">El carrito está vacío</li>
+                        </ul>
+                        <div class="d-flex justify-content-between fw-bold fs-5 mb-3 border-top pt-2">
+                            <span>Total:</span>
+                            <span id="total-carrito" class="text-success">$0</span>
+                        </div>
+                        <button class="btn btn-primary w-100" onclick="confirmarPedido()">Confirmar Pedido</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-2">Síguenos en nuestras redes sociales</p>
+            <a href="https://www.instagram.com/claudia_ariza07" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="text-white text-decoration-none d-inline-flex align-items-center gap-2 fs-5">
+                <i class="bi bi-instagram fs-4 text-danger"></i>
+                <span>claudia_ariza07</span>
+            </a>
+            <hr class="my-3 border-secondary">
+            <small class="text-muted">&copy; GRACIAS POR TU COMPRA, DIOS TE BENDIGA</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

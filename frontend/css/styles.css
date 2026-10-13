@@ -1,0 +1,66 @@
+/* ===================================================
+   Estilos Generales y Fondo con Marca de Agua
+   =================================================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e776af;
+    color: #0f0f0f;
+    /* Marca de agua de fondo */
+    background-image: url('../assets/images/logo.jpeg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: 450px auto;
+}
+
+/* Capa translúcida para que la marca de agua no dificulte la lectura */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(248, 249, 250, 0.88);
+    z-index: -1;
+}
+
+/* Estilo para el Logo en la barra superior */
+.navbar-brand img {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* ===================================================
+   Tarjetas de Productos
+   =================================================== */
+.card-producto {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-producto:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.card-producto img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    height: 220px;
+    object-fit: cover;
+}
+
+/* ===================================================
+   Efecto Hover para Instagram en el Footer
+   =================================================== */
+.hover-instagram {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hover-instagram:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
