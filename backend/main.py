@@ -2,12 +2,7 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import List, Optional
-
-app = FastAPI(
-    title="API Boutique & Pijamas",
-    description="Servidor backend para el proyecto integrador",
-    version="1.0"
-)
+import httpx
 
 app = FastAPI(
     title="API Boutique & Pijamas",
@@ -24,6 +19,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# URL generada en Oracle APEX (Módulo tienda / productos)
+ORDS_URL = "https://oracleapex.com/ords/wenmoviles912189/tienda/productos"
+
 class ProductoCrear(BaseModel):
     nombre: str = Field(..., min_length=3, max_length=120, example="Pijama Satín Dos Piezas")
     descripcion: Optional[str] = Field(None, max_length=300, example="Conjunto de short y camisa de satín suave")
@@ -35,7 +33,7 @@ class ProductoCrear(BaseModel):
 class ProductoRespuesta(ProductoCrear):
     id_producto: int
 
-# Datos de prueba alineados con el diseño de la pagina 
+# Datos de respaldo (fallback) por si la BD no responde
 catalogo_productos = [
     {
         "id_producto": 1,
@@ -47,7 +45,7 @@ catalogo_productos = [
         "imagen_url": "asset/bodys.jpeg"
     },
     {
-       "id_producto": 2,
+        "id_producto": 2,
         "nombre": "Cachetero Encaje Soft",
         "descripcion": "Cachetero suave sin costuras visibles de alta comodidad",
         "precio": 22000.0,
@@ -72,7 +70,6 @@ catalogo_productos = [
         "stock": 18,
         "id_categoria": 1,
         "imagen_url": "asset/top.jpeg"
-
     },
     {
         "id_producto": 5,
@@ -112,7 +109,7 @@ catalogo_productos = [
     }
 ]
 
-#Endpoints
+# Endpoints
 @app.get("/")
 def inicio():
     return {"estado": "Servidor activo", "mensaje": "API de la tienda funcionando"}
@@ -124,8 +121,30 @@ def listar_categorias():
         {"id_categoria": 2, "nombre": "Pijamas"}
     ]
 
+# AQUI ESTA EL CAMBIO: Consulta en vivo a Oracle APEX
 @app.get("/api/productos", response_model=List[ProductoRespuesta])
-def listar_productos():
+async def listar_productos():
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            respuesta = await client.get(ORDS_URL)
+            print(f"--> Código ORDS: {respuesta.status_code}")
+            
+            if respuesta.status_code == 200:
+                datos = respuesta.json()
+                items = datos.get("items", [])
+                print(f"--> Cantidad de items traídos de Oracle: {len(items)}")
+                
+                if items:
+                    # Normalizamos todas las llaves a minúsculas (nombre, precio, etc.)
+                    productos_normalizados = []
+                    for item in items:
+                        item_min = {k.lower(): v for k, v in item.items()}
+                        productos_normalizados.append(item_min)
+                    return productos_normalizados
+    except Exception as e:
+        print(f"--> Error conectando con ORDS: {e}")
+    
+    print("--> Usando catálogo de respaldo local")
     return catalogo_productos
 
 @app.post("/api/productos", response_model=ProductoRespuesta, status_code=status.HTTP_201_CREATED)
