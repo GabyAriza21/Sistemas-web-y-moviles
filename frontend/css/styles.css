@@ -6,7 +6,7 @@ body {
     background-color: #e776af;
     color: #0f0f0f;
     /* Marca de agua de fondo */
-    background-image: url('../assets/images/logo.jpeg');
+    background-image: url('../asset/logo.jpeg');
     background-repeat: no-repeat;
     background-position: center center;
     background-attachment: fixed;
