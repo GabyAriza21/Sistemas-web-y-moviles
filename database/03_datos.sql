@@ -1,12 +1,15 @@
--- Insercion de roles y categorias de pijamas y bodys
+-- 1. Inserción de Roles
 INSERT INTO roles (nombre_rol) VALUES ('Administrador');
 INSERT INTO roles (nombre_rol) VALUES ('Cliente');
 
-INSERT INTO categorias (nombre_categoria, descripcion) VALUES ('Ropa Interior y Bodys', 'Prendas intimas y bodys para mujer');
+-- 2. Inserción de Usuarios de Prueba (Para cumplir con la rúbrica)
+INSERT INTO usuarios (nombre, correo, clave, id_rol)
+VALUES ('Admin Pantys', 'admin@pantysca.com', 'admin123', (SELECT id_rol FROM roles WHERE nombre_rol = 'Administrador'));
 
-COMMIT; 
+INSERT INTO usuarios (nombre, correo, clave, id_rol)
+VALUES ('Cliente Demo', 'cliente@ejemplo.com', 'cliente123', (SELECT id_rol FROM roles WHERE nombre_rol = 'Cliente'));
 
--- Inserción de Categorías
+-- 3. Inserción de Categorías (Sin duplicados)
 INSERT INTO categorias (nombre_categoria, descripcion)
 VALUES ('Ropa Interior y Bodys', 'Prendas intimas, bodys y conjuntos comodos');
 
@@ -15,7 +18,7 @@ VALUES ('Pijamas', 'Pijamas de descanso en seda, satin y algodon');
 
 COMMIT;
 
--- Inserción de Productos (Ropa Interior y Bodys)
+-- 4. Inserción de Productos (Ropa Interior y Bodys)
 INSERT INTO productos (nombre, descripcion, precio, stock, id_categoria, imagen_url)
 VALUES ('Body Encaje Velvet', 'Body delicado con copa prehormada y detalles en encaje', 55000.0, 12, (SELECT id_categoria FROM categorias WHERE nombre_categoria = 'Ropa Interior y Bodys'), 'asset/bodys.jpeg');
 
@@ -28,7 +31,7 @@ VALUES ('Set Ropa Interior Glam', 'Conjunto de dos piezas en encaje fino ajustab
 INSERT INTO productos (nombre, descripcion, precio, stock, id_categoria, imagen_url)
 VALUES ('Top Básico Confort', 'Top de descanso con soporte ligero en tela transpirable', 32000.0, 18, (SELECT id_categoria FROM categorias WHERE nombre_categoria = 'Ropa Interior y Bodys'), 'asset/top.jpeg');
 
--- Inserción de Productos (Pijamas)
+-- 5. Inserción de Productos (Pijamas)
 INSERT INTO productos (nombre, descripcion, precio, stock, id_categoria, imagen_url)
 VALUES ('Pijama Satín Clásica', 'Conjunto de camisa manga larga y pantalón en satín brillante', 75000.0, 15, (SELECT id_categoria FROM categorias WHERE nombre_categoria = 'Pijamas'), 'asset/pijama.jpeg');
 
