@@ -4,10 +4,12 @@ FROM productos p
 JOIN categorias c ON p.id_categoria = c.id_categoria
 ORDER BY p.id_producto;
 
--- 2. Filtrar productos por categoría específica
-SELECT p.id_producto, p.nombre, p.precio, p.stock, p.imagen_url
-FROM productos p
-WHERE p.id_categoria = 1;
+-- 2. Indicadores (Dashboard)
+SELECT 
+    (SELECT COUNT(*) FROM productos) AS total_productos,
+    (SELECT COUNT(*) FROM pedidos) AS total_pedidos,
+    (SELECT NVL(SUM(total), 0) FROM pedidos) AS total_ventas
+FROM dual;
 
 -- 3. Consultar historial de pedidos de un usuario con su detalle
 SELECT pe.id_pedido, pe.fecha_pedido, pe.total, pe.estado, pr.nombre AS producto, dp.cantidad, dp.precio_unitario

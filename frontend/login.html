@@ -176,32 +176,59 @@
             localStorage.setItem("usuarios_app", JSON.stringify(usuarios));
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             const correo = document.getElementById('correoLogin').value.trim().toLowerCase();
             const password = document.getElementById('passwordLogin').value;
 
-            const usuarios = obtenerUsuarios();
+            try {
+                // 1. Petición al endpoint oficial de FastAPI
+                const respuesta = await fetch('http://127.0.0.1:8000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        correo: correo,
+                        clave: password
+                    })
+                });
 
-            if (usuarios[correo]) {
-                if (usuarios[correo].password !== password) {
-                    alert("Error: Contraseña incorrecta. Por favor inténtalo de nuevo.");
-                    document.getElementById('passwordLogin').value = "";
-                    document.getElementById('passwordLogin').focus();
+                if (respuesta.ok) {
+                    const data = await respuesta.json();
+                    
+                    // Guardamos la sesión con el rol devuelto por el Backend
+                    localStorage.setItem("usuario_sesion", JSON.stringify({
+                        id_usuario: data.id_usuario,
+                        nombre: data.nombre,
+                        correo: data.correo,
+                        rol: data.rol
+                    }));
+
+                    alert(`¡Inicio de sesión exitoso!\nBienvenid@: ${data.nombre} (${data.rol})`);
+
+                    // Redirección según rol (Punto 9 de la rúbrica)
+                    if (data.rol === 'Administrador') {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
                     return;
                 }
-            } else {
-                if (password.length < 4) {
-                    alert("Por favor ingresa una contraseña válida (mínimo 4 caracteres).");
-                    return;
-                }
+            } catch (error) {
+                console.warn("Backend no disponible, recurriendo a validación local.");
             }
 
-            const nombreUsuario = usuarios[correo] ? usuarios[correo].nombre : correo.split('@')[0];
-            localStorage.setItem("usuario_sesion", JSON.stringify({ nombre: nombreUsuario, correo: correo }));
-
-            alert(`¡Inicio de sesión exitoso!\nBienvenid@: ${nombreUsuario}`);
-            window.location.href = 'index.html';
+            // 2. Respaldo local por si el backend está apagado
+            const usuarios = obtenerUsuarios();
+            if (usuarios[correo] && usuarios[correo].password === password) {
+                const nombreUsuario = usuarios[correo].nombre;
+                localStorage.setItem("usuario_sesion", JSON.stringify({ nombre: nombreUsuario, correo: correo, rol: 'Cliente' }));
+                alert(`¡Inicio de sesión exitoso!\nBienvenid@: ${nombreUsuario}`);
+                window.location.href = 'index.html';
+            } else {
+                alert("Error: Correo o contraseña incorrectos. Verifica tus credenciales.");
+                document.getElementById('passwordLogin').value = "";
+                document.getElementById('passwordLogin').focus();
+            }
         }
 
         function ejecutarRecuperacion(event) {

@@ -48,6 +48,11 @@ class PedidoCrear(BaseModel):
     items: List[ItemPedido]
     total: float = Field(..., gt=0)
 
+# --- MODELO DE DATOS (LOGIN - RÚBRICA PTO 9) ---
+class LoginEntrada(BaseModel):
+    correo: str = Field(..., example="admin@pantysca.com")
+    clave: str = Field(..., example="admin123")
+
 # Catálogo local de respaldo por si falla la red
 catalogo_productos = [
     {"id_producto": 1, "nombre": "Body Encaje Velvet", "descripcion": "Body delicado con copa prehormada y detalles en encaje", "precio": 55000.0, "stock": 12, "id_categoria": 1, "imagen_url": "asset/bodys.jpeg"},
@@ -60,7 +65,16 @@ catalogo_productos = [
     {"id_producto": 8, "nombre": "Combo Set Descanso", "descripcion": "Set completo de 3 piezas: bata ligera, blusa y pantalón", "precio": 89000.0, "stock": 10, "id_categoria": 2, "imagen_url": "asset/combo set.jpeg"}
 ]
 
-# --- ENDPOINTS ---
+# Usuarios registrados alineados con la BD (Pto 9: Dos roles)
+usuarios_sistema = [
+    {"id_usuario": 1, "nombre": "Admin Pantys", "correo": "admin@pantysca.com", "clave": "admin123", "rol": "Administrador"},
+    {"id_usuario": 2, "nombre": "Cliente Demo", "correo": "cliente@ejemplo.com", "clave": "cliente123", "rol": "Cliente"}
+]
+
+# Registro acumulado de pedidos
+pedidos_guardados = []
+
+# --- ENDPOINTS EXISTENTES ---
 
 @app.get("/")
 def inicio():
@@ -90,12 +104,73 @@ async def listar_productos():
 
 @app.post("/api/pedidos", status_code=status.HTTP_201_CREATED)
 def crear_pedido(pedido: PedidoCrear):
-    # Genera un ID simulado para confirmar la orden recibida
-    id_pedido_generado = 101
+    id_pedido_generado = len(pedidos_guardados) + 101
+    nuevo_pedido = {
+        "id_pedido": id_pedido_generado,
+        "cliente": pedido.nombre_cliente,
+        "telefono": pedido.telefono,
+        "total": pedido.total,
+        "cantidad_articulos": len(pedido.items),
+        "items": [item.dict() for item in pedido.items]
+    }
+    pedidos_guardados.append(nuevo_pedido)
     return {
         "mensaje": "Pedido registrado exitosamente",
         "id_pedido": id_pedido_generado,
         "cliente": pedido.nombre_cliente,
         "total": pedido.total,
         "cantidad_articulos": len(pedido.items)
+    }
+
+# --- ENDPOINTS NUEVOS PARA CUMPLIR LA RÚBRICA ---
+
+# 1. Autenticación con 2 roles (Punto 9 de la rúbrica)
+@app.post("/api/auth/login")
+def login(credenciales: LoginEntrada):
+    for u in usuarios_sistema:
+        if u["correo"].strip().lower() == credenciales.correo.strip().lower() and u["clave"] == credenciales.clave:
+            return {
+                "id_usuario": u["id_usuario"],
+                "nombre": u["nombre"],
+                "correo": u["correo"],
+                "rol": u["rol"],
+                "mensaje": "Autenticación satisfactoria"
+            }
+    raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
+
+# 2. Consultar un producto por ID (Read específico - Punto 8)
+@app.get("/api/productos/{id_producto}")
+def obtener_producto(id_producto: int):
+    for p in catalogo_productos:
+        if p["id_producto"] == id_producto:
+            return p
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+# 3. Actualizar producto (Update - Puntos 4 y 8)
+@app.put("/api/productos/{id_producto}")
+def actualizar_producto(id_producto: int, producto_actualizado: ProductoCrear):
+    for i, p in enumerate(catalogo_productos):
+        if p["id_producto"] == id_producto:
+            catalogo_productos[i] = {"id_producto": id_producto, **producto_actualizado.dict()}
+            return {"mensaje": "Producto modificado con éxito", "producto": catalogo_productos[i]}
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+# 4. Eliminar producto (Delete - Puntos 4 y 8)
+@app.delete("/api/productos/{id_producto}")
+def eliminar_producto(id_producto: int):
+    for i, p in enumerate(catalogo_productos):
+        if p["id_producto"] == id_producto:
+            eliminado = catalogo_productos.pop(i)
+            return {"mensaje": f"Producto '{eliminado['nombre']}' eliminado correctamente"}
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+# 5. Dashboard con indicadores calculados (Punto 4 de la rúbrica)
+@app.get("/api/dashboard")
+def dashboard_indicadores():
+    total_ventas = sum(p["total"] for p in pedidos_guardados)
+    return {
+        "total_productos": len(catalogo_productos),
+        "total_pedidos": len(pedidos_guardados),
+        "total_ventas": total_ventas,
+        "productos_stock_bajo": len([p for p in catalogo_productos if p["stock"] <= 10])
     }
