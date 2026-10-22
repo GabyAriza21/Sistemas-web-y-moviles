@@ -41,7 +41,7 @@
             </button>
         </div>
 
-        <!-- Tarjetas de Indicadores (Métricas obtenidas desde FastAPI /api/dashboard) -->
+        <!-- Tarjetas de Indicadores -->
         <div class="row g-3 mb-4">
             <div class="col-sm-6 col-lg-3">
                 <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
@@ -100,7 +100,7 @@
             </div>
         </div>
 
-        <!-- Tabla de Gestión de Productos (CRUD: Read, Update, Delete) -->
+        <!-- Tabla de Gestión de Productos -->
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold text-dark mb-0">Inventario de Productos</h5>
@@ -130,7 +130,7 @@
         </div>
     </main>
 
-    <!-- Modal para Crear/Editar Producto (CRUD: Create & Update) -->
+    <!-- Modal para Crear/Editar Producto -->
     <div class="modal fade" id="modalNuevoProducto" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 shadow">
@@ -185,11 +185,11 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Lógica del Dashboard y Operaciones CRUD contra FastAPI -->
+    <!-- Lógica del Dashboard -->
     <script>
-        const API_URL = "http://127.0.0.1:8000";
+        const API_URL = "https://psychic-barnacle-v6r7gqg69pwx2xrp-8000.app.github.dev/api";
 
-        // 1. Control de acceso: Verificar que el usuario sea Administrador
+        // 1. Control de acceso
         document.addEventListener("DOMContentLoaded", () => {
             const sesion = JSON.parse(localStorage.getItem("usuario_sesion") || "{}");
             if (sesion.rol !== "Administrador") {
@@ -197,15 +197,15 @@
                 window.location.href = "login.html";
                 return;
             }
-            document.getElementById("infoAdmin").textContent = `👤 ${sesion.nombre} (${sesion.rol})`;
+            document.getElementById("infoAdmin").textContent = `👤 ${sesion.nombre || 'Admin'} (${sesion.rol})`;
             cargarDatosDashboard();
         });
 
         // 2. Consumo de Métricas y Catálogo
         async function cargarDatosDashboard() {
             try {
-                // Métricas
-                const resDashboard = await fetch(`${API_URL}/api/dashboard`);
+                // Métricas (Ruta corregida: \${API_URL}/dashboard)
+                const resDashboard = await fetch(`${API_URL}/dashboard`);
                 if (resDashboard.ok) {
                     const kpis = await resDashboard.json();
                     document.getElementById("metricaProductos").textContent = kpis.total_productos;
@@ -214,8 +214,8 @@
                     document.getElementById("metricaStockBajo").textContent = kpis.productos_stock_bajo;
                 }
 
-                // Listado de Productos
-                const resProd = await fetch(`${API_URL}/api/productos`);
+                // Listado de Productos (Ruta corregida: \${API_URL}/productos)
+                const resProd = await fetch(`${API_URL}/productos`);
                 if (resProd.ok) {
                     const productos = await resProd.json();
                     renderizarTabla(productos);
@@ -225,7 +225,7 @@
             }
         }
 
-        // 3. Renderizar filas en la tabla con botones de Editar y Eliminar
+        // 3. Renderizar filas en la tabla
         function renderizarTabla(productos) {
             const tbody = document.getElementById("tablaProductosAdmin");
             tbody.innerHTML = "";
@@ -277,17 +277,12 @@
             };
 
             try {
-                let respuesta;
                 if (id) {
-                    // PUT /api/productos/{id}
-                    respuesta = await fetch(`${API_URL}/api/productos/${id}`, {
+                    await fetch(`${API_URL}/productos/${id}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(productoData)
                     });
-                } else {
-                    // POST /api/productos (simulado o a través de creación directa)
-                    alert("Producto registrado en inventario.");
                 }
 
                 bootstrap.Modal.getInstance(document.getElementById("modalNuevoProducto")).hide();
@@ -311,12 +306,12 @@
             new bootstrap.Modal(document.getElementById("modalNuevoProducto")).show();
         }
 
-        // 5. CRUD: Eliminar Producto (DELETE /api/productos/{id})
+        // 5. CRUD: Eliminar Producto
         async function eliminarProducto(id) {
             if (!confirm(`¿Estás segura de eliminar el producto #${id}?`)) return;
 
             try {
-                const res = await fetch(`${API_URL}/api/productos/${id}`, {
+                const res = await fetch(`${API_URL}/productos/${id}`, {
                     method: "DELETE"
                 });
                 if (res.ok) {
