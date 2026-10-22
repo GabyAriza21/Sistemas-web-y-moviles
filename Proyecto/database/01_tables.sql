@@ -6,6 +6,7 @@ CREATE TABLE roles (
 
 -- Tabla de Usuarios
 CREATE TABLE usuarios (
+
     id_usuario NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL,
     correo VARCHAR2(100) NOT NULL UNIQUE,
